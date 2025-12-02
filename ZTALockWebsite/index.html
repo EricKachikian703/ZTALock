@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zero Trust Network Architecture – Capstone Project</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050616;
+      --bg-alt: #0c1024;
+      --accent: #4dd0e1;
+      --accent-soft: rgba(77, 208, 225, 0.15);
+      --text-main: #f5f7ff;
+      --text-muted: #a3acc6;
+      --card-bg: #12172c;
+      --border-soft: rgba(255, 255, 255, 0.05);
+      --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #18213f 0, #050616 55%);
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Layout */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(
+        to bottom,
+        rgba(5, 6, 22, 0.95),
+        rgba(5, 6, 22, 0.7)
+      );
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .nav {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .nav-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.9rem;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    main {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+    }
+
+    section {
+      margin-bottom: 3rem;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 2.5rem;
+      align-items: center;
+      margin-bottom: 3rem;
+    }
+
+    .hero-title {
+      font-size: clamp(2.1rem, 3.2vw, 2.7rem);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      max-width: 34rem;
+    }
+
+    .hero-meta {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-card {
+      border-radius: 1rem;
+      background: radial-gradient(circle at top left, #27345b, #101425);
+      box-shadow: var(--shadow-soft);
+      padding: 1.25rem 1.4rem;
+      border: 1px solid var(--border-soft);
+      font-size: 0.9rem;
+    }
+
+    .hero-card h3 {
+      font-size: 0.95rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-card p {
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-card .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+
+    .pill {
+      border-radius: 999px;
+      border: 1px solid var(--border-soft);
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* Cards and content */
+
+    .section-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      max-width: 40rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.75rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 0.9rem;
+      border: 1px solid var(--border-soft);
+      padding: 1.25rem 1.4rem;
+      box-shadow: var(--shadow-soft);
+      font-size: 0.95rem;
+    }
+
+    .card h3 {
+      font-size: 1.02rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .card p {
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .card ul {
+      margin-left: 1.1rem;
+      margin-top: 0.35rem;
+      color: var(--text-muted);
+    }
+
+    .card li {
+      margin-bottom: 0.25rem;
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
+    .table {
+      width: 100%;
+      margin-top: 0.75rem;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .table th,
+    .table td {
+      padding: 0.3rem 0.4rem;
+      border-bottom: 1px solid var(--border-soft);
+      text-align: left;
+    }
+
+    .table th {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      margin-left: 0.35rem;
+    }
+
+    .callout {
+      margin-top: 0.75rem;
+      border-radius: 0.75rem;
+      border: 1px dashed var(--border-soft);
+      padding: 0.7rem 0.9rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .callout strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .code-block {
+      margin-top: 0.6rem;
+      background: #060814;
+      border-radius: 0.6rem;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--border-soft);
+      font-size: 0.82rem;
+      overflow-x: auto;
+    }
+
+    footer {
+      border-top: 1px solid var(--border-soft);
+      padding: 1.25rem 1.25rem 2.2rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+      background: #050616;
+    }
+
+    @media (max-width: 800px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .grid-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-links {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="nav-title">Zero Trust Network – Capstone</div>
+      <nav class="nav-links">
+        <a href="#overview">Overview</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#security">Security Controls</a>
+        <a href="#testing">Testing</a>
+        <a href="#about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero" id="overview">
+      <div>
+        <span class="tag">Computer Science Capstone • Network Security</span>
+        <h1 class="hero-title">
+          Zero Trust Network Architecture in Cisco Packet Tracer
+        </h1>
+        <p class="hero-subtitle">
+          A segmented enterprise network with VLANs, ACL-based microsegmentation,
+          DHCP snooping, port security, and a DMZ. Designed and implemented in
+          Cisco Packet Tracer to demonstrate Zero Trust principles.
+        </p>
+        <div class="hero-meta">
+          <strong>Project Type:</strong> Individual capstone<br />
+          <strong>Technologies:</strong> Cisco 2911, 2960 switches, VLANs, OSPF
+          (single site), ACLs, NAT, Syslog, AAA (local), SSH
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <h3>Project Summary</h3>
+        <p>
+          The goal of this project was to redesign a flat campus LAN into a
+          Zero Trust–inspired network. Each department now lives in its own
+          VLAN with tightly controlled access enforced at the router using
+          inbound ACLs. A dedicated DMZ hosts public web services, and the
+          internal management plane is isolated on its own subnet.
+        </p>
+        <div class="pill-row">
+          <span class="pill">VLAN Segmentation</span>
+          <span class="pill">DMZ</span>
+          <span class="pill">ACL Microsegmentation</span>
+          <span class="pill">AAA + SSH</span>
+          <span class="pill">DHCP Snooping</span>
+          <span class="pill">Port Security</span>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Requirements / Goals -->
+    <section>
+      <h2 class="section-title">Objectives</h2>
+      <div style="border-bottom:1px solid rgba(255,255,255,0.12); margin:0.6rem 0 1.4rem;"></div>
+      <p class="section-subtitle">
+        The project follows the “never trust, always verify” mindset. Instead of
+        one big trusted LAN, users, servers, and guests are separated and must
+        be explicitly allowed to talk to each other.
+      </p>
+      <div class="grid-2">
+        <article class="card">
+          <h3>Project Goals</h3>
+          <ul>
+            <li>Design a realistic multi-VLAN enterprise network.</li>
+            <li>
+              Enforce Zero Trust microsegmentation using inbound ACLs on R1.
+            </li>
+            <li>Isolate public services in a dedicated DMZ VLAN.</li>
+            <li>
+              Secure management access using SSH and local AAA on the router and
+              switches.
+            </li>
+            <li>
+              Detect and block rogue devices with DHCP Snooping and Port
+              Security.
+            </li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3>Scope & Constraints</h3>
+          <ul>
+            <li>Single physical site using Cisco Packet Tracer 8.x.</li>
+            <li>
+              No real VPN clients or RADIUS/TACACS+ (Packet Tracer limitation).
+            </li>
+            <li>
+              AAA implemented with <span class="mono">aaa new-model</span> and
+              local user accounts.
+            </li>
+            <li>
+              IPv4-only; IPv6, 802.1X, and full endpoint compliance are
+              out-of-scope.
+            </li>
+          </ul>
+          <div class="callout">
+            <strong>Note:</strong> Even with these limits, the network still
+            demonstrates strong Zero Trust concepts: least privilege, explicit
+            verification, and continuous monitoring.
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Architecture -->
+<section id="architecture">
+  <h2 class="section-title">Network Architecture</h2>
+  <div style="border-bottom:1px solid rgba(255,255,255,0.12); margin:0.6rem 0 1.4rem;"></div>
+
+<section id="topology">
+  <h3 class="section-subtitle" style="font-size:1.2rem; margin-bottom:0.75rem;">
+    Network Topology
+  </h3>
+
+  <p class="section-subtitle">
+    The full enterprise Zero Trust topology designed and implemented in Cisco
+    Packet Tracer. Each department, server group, and DMZ zone is isolated
+    using VLANs, ACL microsegmentation, and strict access control.
+  </p>
+
+  <div class="card" style="text-align:center; padding:1.5rem;">
+    <img src="topology.png" alt="Network Topology Diagram"
+      style="max-width:100%; border-radius:0.75rem; border:1px solid rgba(255,255,255,0.08); box-shadow:0 18px 40px rgba(0,0,0,0.35);" />
+  </div>
+
+  <div class="callout" style="margin-top:1.25rem;">
+    <strong>Diagram Overview:</strong>  
+    HR, Finance, Users, Guest, Management, Server, and DMZ networks each reside
+    in isolated VLANs. R1 routes traffic using subinterfaces, NAT provides
+    Internet access, and ACLs enforce strict Zero Trust communication paths.
+  </div>
+</section>
+</div>
+      <p class="section-subtitle">
+        The design uses a Cisco 2911 router for inter-VLAN routing and Internet
+        access, with two Cisco 2960 switches providing user and server
+        connectivity. VLANs separate HR, Finance, Users, Management, Servers,
+        Guest, and the DMZ.
+      </p>
+
+      <div class="card">
+        <h3>VLANs & Subnets</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>VLAN</th>
+              <th>Name</th>
+              <th>Subnet</th>
+              <th>Gateway (R1)</th>
+              <th>Example Devices</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>10</td>
+              <td>USERS</td>
+              <td>192.168.10.0/24</td>
+              <td>192.168.10.1</td>
+              <td>User1, User2 PCs</td>
+            </tr>
+            <tr>
+              <td>20</td>
+              <td>SERVERS</td>
+              <td>192.168.20.0/24</td>
+              <td>192.168.20.1</td>
+              <td>DNS (192.168.20.20), Web (192.168.20.22)</td>
+            </tr>
+            <tr>
+              <td>30</td>
+              <td>MGMT</td>
+              <td>192.168.30.0/24</td>
+              <td>192.168.30.1</td>
+              <td>Admin PC, switch SVI</td>
+            </tr>
+            <tr>
+              <td>40</td>
+              <td>GUEST</td>
+              <td>192.168.40.0/24</td>
+              <td>192.168.40.1</td>
+              <td>Guest PC (Internet only)</td>
+            </tr>
+            <tr>
+              <td>50</td>
+              <td>HR</td>
+              <td>192.168.50.0/24</td>
+              <td>192.168.50.1</td>
+              <td>HR workstation</td>
+            </tr>
+            <tr>
+              <td>60</td>
+              <td>FINANCE</td>
+              <td>192.168.60.0/24</td>
+              <td>192.168.60.1</td>
+              <td>Finance workstation</td>
+            </tr>
+            <tr>
+              <td>70</td>
+              <td>DMZ</td>
+              <td>192.168.70.0/24</td>
+              <td>192.168.70.1</td>
+              <td>Public Web Server (192.168.70.10)</td>
+            </tr>
+            <tr>
+              <td>99</td>
+              <td>NATIVE</td>
+              <td>192.168.99.0/24</td>
+              <td>192.168.99.1</td>
+              <td>Router–switch trunk native VLAN</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <strong>Inter-VLAN Routing:</strong> R1 uses
+          <span class="mono">GigabitEthernet0/0.x</span> subinterfaces (one per
+          VLAN) with 802.1Q tagging to route traffic between segments while
+          enforcing ACLs on each interface.
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top: 1.75rem">
+        <article class="card">
+          <h3>DMZ Design</h3>
+          <p>
+            VLAN 70 hosts a public-facing web server reachable from the
+            Internet, but isolated from the internal LAN. ACLs on the DMZ
+            subinterface allow:
+          </p>
+          <ul>
+            <li>HTTP/HTTPS from any external client to 192.168.70.10</li>
+            <li>ICMP for basic reachability tests</li>
+            <li>SSH from the Management VLAN (192.168.30.0/24) only</li>
+          </ul>
+          <p>
+            All other inbound and outbound traffic from the DMZ is denied by
+            default, preventing pivoting into internal networks.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Internet Edge (NAT)</h3>
+          <p>
+            A simulated ISP is connected to R1 via
+            <span class="mono">GigabitEthernet0/1</span> using public IP
+            203.0.113.2/24. R1 performs PAT (NAT overload) for all 192.168.x.x
+            addresses:
+          </p>
+          <div class="code-block mono">
+            access-list NAT_INSIDE permit 192.168.0.0 0.0.255.255<br />
+            ip nat inside source list NAT_INSIDE interface Gi0/1 overload
+          </div>
+          <p style="margin-top: 0.4rem">
+            This allows internal hosts to browse the Internet while hiding
+            private addresses behind a single public IP.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Security Controls -->
+    <section id="security">
+      <h2 class="section-title">Security Controls</h2>
+      <div style="border-bottom:1px solid rgba(255,255,255,0.12); margin:0.6rem 0 1.4rem;"></div>
+      <p class="section-subtitle">
+        Multiple layers of security work together: segmentation (VLANs), policy
+        enforcement (ACLs), device-level protections (Port Security, DHCP
+        Snooping), and secure management (AAA + SSH + Syslog).
+      </p>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>ACL Microsegmentation</h3>
+          <p>
+            Every user-facing VLAN has an inbound ACL on its R1 subinterface.
+            For example, the USERS ACL (<span class="mono">ACL_USERS_IN</span>)
+            allows:
+          </p>
+          <ul>
+            <li>DNS + HTTP/HTTPS to internal servers</li>
+            <li>General Internet access via NAT</li>
+            <li>ICMP to specific servers for testing</li>
+          </ul>
+          <p>
+            Traffic to other internal subnets is denied by default, preventing
+            lateral movement between departments.
+          </p>
+          <div class="code-block mono">
+            ! Example (simplified)<br />
+            permit tcp 192.168.10.0 0.0.0.255 host 192.168.20.22 eq www<br />
+            deny&nbsp;&nbsp;ip 192.168.10.0 0.0.0.255 192.168.0.0 0.0.255.255<br />
+            permit ip 192.168.10.0 0.0.0.255 any
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>DHCP Snooping &amp; Port Security</h3>
+          <p>
+            DHCP Snooping is enabled on both switches for all VLANs. Only the
+            uplink to R1 is trusted; all access ports are untrusted. A rogue
+            DHCP server connected to the Guest network cannot hand out IP
+            addresses.
+          </p>
+          <p>
+            Port Security restricts each access port to a single MAC address,
+            detecting unauthorized devices and limiting switch-cam attacks.
+          </p>
+          <div class="code-block mono">
+            ip dhcp snooping<br />
+            ip dhcp snooping vlan 10,20,30,40,50,60,70<br />
+            interface Fa0/1<br />
+            &nbsp; ip dhcp snooping trust
+          </div>
+        </article>
+      </div>
+
+      <div class="grid-2" style="margin-top: 1.75rem">
+        <article class="card">
+          <h3>Secure Management Plane (AAA + SSH)</h3>
+          <p>
+            Telnet and HTTP are disabled. R1 and both switches use SSHv2 with
+            local AAA:
+          </p>
+          <ul>
+            <li><span class="mono">aaa new-model</span></li>
+            <li>Login and exec authorization via local user database</li>
+            <li>VTY lines restricted to SSH only</li>
+          </ul>
+          <div class="code-block mono">
+            aaa new-model<br />
+            aaa authentication login default local<br />
+            username admin privilege 15 secret &lt;password&gt;<br />
+            line vty 0 15<br />
+            &nbsp; transport input ssh<br />
+            &nbsp; login authentication default
+          </div>
+          <p class="callout">
+            Only the Management VLAN can SSH into network devices, enforcing
+            role-based access to configuration.
+          </p>
+        </article>
+
+        <article class="card">
+          <h3>Monitoring with Syslog</h3>
+          <p>
+            A central Syslog server (on the Servers VLAN) receives logs from R1
+            and both switches, including:
+          </p>
+          <ul>
+            <li>Interface up/down events</li>
+            <li>Port Security violations (where PT supports them)</li>
+            <li>Login attempts and config changes</li>
+          </ul>
+          <div class="code-block mono">
+            logging 192.168.20.20<br />
+            service timestamps log datetime msec<br />
+            logging on
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Testing -->
+    <section id="testing">
+      <h2 class="section-title">Testing &amp; Validation</h2>
+      <div style="border-bottom:1px solid rgba(255,255,255,0.12); margin:0.6rem 0 1.4rem;"></div>
+      <p class="section-subtitle">
+        The network was validated through structured tests focused on
+        segmentation, access control, rogue device behavior, and secure
+        management.
+      </p>
+
+      <div class="grid-2">
+        <article class="card">
+          <h3>Segmentation &amp; Access Tests</h3>
+          <ul>
+            <li>
+              All hosts successfully obtained IPs via DHCP and reached their
+              default gateways.
+            </li>
+            <li>
+              USERS could reach internal DNS / web servers and the Internet.
+            </li>
+            <li>
+              HR and Finance could reach the Internet but not each other.
+            </li>
+            <li>
+              Guest could reach only the Internet (no 192.168.x.x access).
+            </li>
+            <li>
+              Admin (MGMT) could SSH into R1 and switches; other VLANs could
+              not.
+            </li>
+          </ul>
+          <div class="callout">
+            <strong>Key result:</strong> No lateral movement was possible across
+            departments; all cross-VLAN access had to be explicitly permitted.
+          </div>
+        </article>
+
+        <article class="card">
+          <h3>Rogue Device &amp; DMZ Tests</h3>
+          <ul>
+            <li>
+              A rogue DHCP server connected to the Guest VLAN failed to assign
+              addresses; legitimate bindings still appeared in the
+              <span class="mono">show ip dhcp snooping binding</span> table.
+            </li>
+            <li>
+              The DMZ web server was reachable via HTTP/HTTPS from external
+              clients but could not initiate connections into internal VLANs.
+            </li>
+            <li>
+              NAT translations were confirmed with
+              <span class="mono">show ip nat translations</span>, mapping
+              192.168.x.x hosts to 203.0.113.2.
+            </li>
+          </ul>
+        </article>
+      </div>
+
+      <div class="card" style="margin-top: 1.75rem">
+        <h3>Limitations</h3>
+        <ul>
+          <li>
+            Packet Tracer does not support full VPN clients, RADIUS/TACACS+, or
+            endpoint posture checks; remote-access Zero Trust is not modeled.
+          </li>
+          <li>
+            Port Security behavior (err-disable on violation) is inconsistent in
+            the simulator compared to real IOS.
+          </li>
+          <li>
+            AAA is limited to local accounts; centralized identity is future
+            work.
+          </li>
+        </ul>
+      </div>
+    </section>
+
+<!-- About -->
+<section id="about">
+  <h2 class="section-title">About the Author</h2>
+  <div style="border-bottom:1px solid rgba(255,255,255,0.12); margin:0.6rem 0 1.4rem;"></div>
+
+  <div class="grid-2">
+
+    <!-- Background Card -->
+    <article class="card">
+      <h3>Background</h3>
+      <p>
+        I am a Computer Science student with a strong interest in networking
+        and security. This capstone project gave me hands-on experience with
+        Cisco routing and switching, access control, and practical Zero Trust design.
+      </p>
+      <p>
+        Through this work I learned how to design layered defenses,
+        troubleshoot ACLs and NAT, and reason about how attackers might move
+        through an internal network.
+      </p>
+    </article>
+
+    <!-- Downloads Card -->
+    <article class="card">
+      <h3>Downloads &amp; Links</h3>
+      <ul>
+        <li>
+          <strong>Packet Tracer File:</strong>
+          <a href="https://github.com/EricKachikian703/ZTALock/blob/main/ZTA_FInalProject.pkt" target="_blank">
+            Link to GitHub page for ZTA_FinalProject.pkt
+          </a>
+        </li>
+
+        <li>
+          <strong>Project Presentation:</strong>
+          <a href="https://github.com/EricKachikian703/ZTALock/blob/main/ZTA_Presentation.pptx" target="_blank">
+            Link to GitHub page for ZTA_Presentation.pptx
+          </a>
+        </li>
+      </ul>
+    </article>
+
+  </div>
+</section>
+
+  <footer>
+    Zero Trust Network Architecture – Capstone Project<br />
+    <!-- You can change this to your real name / semester -->
+    &copy; <span id="year"></span> Your Name • CSU Channel Islands
+  </footer>
+
+  <script>
+    // Set current year in footer
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
