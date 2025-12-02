@@ -4,7 +4,7 @@ This repository contains my Zero Trust Network project built in Cisco Packet Tra
 
 For full documentation, screenshots, diagrams, and explanations, visit the project website:
 
-Project Website (GitHub Pages):
+Project Website (GitHub Pages): https://erickachikian703.github.io/ZTALock/
 
 About the Project
 
