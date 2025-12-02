@@ -6,7 +6,7 @@ For full documentation, screenshots, diagrams, and explanations, visit the proje
 
 Project Website (GitHub Pages): https://erickachikian703.github.io/ZTALock/
 
-About the Project
+**About the Project:**
 
 This project demonstrates a Zero Trust Network Architecture using:
 
